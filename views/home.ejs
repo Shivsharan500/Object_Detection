@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Object_Detection</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <h1>YOLOv8 Camera Prediction</h1>
+
+    <video id="video" autoplay></video>
+    <canvas id="canvas" style="display:none;"></canvas>
+
+    <div>
+        <button id="start" class="btn">Start Camera</button>
+        <button id="capture" class="btn">Capture</button>
+        <button id="predictBtn" class="btn">Run Prediction</button>
+    </div>
+
+    <div id="loader">Running prediction, please wait...</div>
+
+    <div id="result-section">
+        <h2>Predicted Image</h2>
+        <img id="outputImg" style="display:none;" />
+    </div>
+
+    <script src="/script.js"></script>
+
+</body>
+</html>
