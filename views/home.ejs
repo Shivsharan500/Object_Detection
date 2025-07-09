@@ -4,7 +4,54 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Object_Detection</title>
-    <link rel="stylesheet" href="/style.css">
+    <style>
+        body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f2f5f9;
+      color: #333;
+      text-align: center;
+      padding: 30px;
+    }
+
+    h1 {
+      color: #2c3e50;
+      margin-bottom: 20px;
+    }
+
+    video, canvas, #outputImg {
+      border: 4px solid #2c3e50;
+      border-radius: 12px;
+      max-width: 100%;
+      width: 400px;
+      margin-bottom: 20px;
+    }
+
+    .btn {
+      background-color: #3498db;
+      border: none;
+      color: white;
+      padding: 12px 20px;
+      margin: 10px 8px;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .btn:hover {
+      background-color: #2980b9;
+    }
+
+    #loader {
+      display: none;
+      font-size: 16px;
+      color: #e67e22;
+    }
+
+    #result-section {
+      margin-top: 30px;
+    }
+    </style>
 </head>
 <body>
     <h1>YOLOv8 Camera Prediction</h1>
@@ -25,7 +72,54 @@
         <img id="outputImg" style="display:none;" />
     </div>
 
-    <script src="/script.js"></script>
-
 </body>
+<script>
+    const video = document.getElementById("video");
+    const canvas = document.getElementById("canvas");
+    const startBtn = document.getElementById("start");
+    const captureBtn = document.getElementById("capture");
+    const predictBtn = document.getElementById("predictBtn");
+    const outputImg = document.getElementById("outputImg");
+    const loader = document.getElementById("loader");
+
+    startBtn.onclick = async () => {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      video.srcObject = stream;
+    };
+
+    captureBtn.onclick = async () => {
+      const context = canvas.getContext("2d");
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const dataURL = canvas.toDataURL("image/png");
+
+      const res = await fetch("/upload", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image: dataURL }),
+      });
+
+      const data = await res.json();
+      alert(data.message || "Image uploaded!");
+    };
+
+    predictBtn.onclick = async () => {
+      predictBtn.disabled = true;
+      loader.style.display = "block";
+
+      const res = await fetch("/predict", { method: "POST" });
+      const data = await res.json();
+
+      loader.style.display = "none";
+      predictBtn.disabled = false;
+
+      if (data.success) {
+        outputImg.src = data.predictedImage;
+        outputImg.style.display = "block";
+      } else {
+        alert("Prediction failed.");
+      }
+    };
+</script>
 </html>
