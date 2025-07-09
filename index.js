@@ -8,7 +8,7 @@ const path = require("path");
 const fs = require("fs");
 const { google } = require("googleapis");
 const bodyParser = require("body-parser");
-const { exec } = require("child_process");
+const {exec} = require("child_process");
 
 
 app.set("view engine","ejs");
@@ -42,7 +42,7 @@ app.post("/upload" , async (req,res) => {
 
     
 
-    const driveRes = drive.files.create({
+    const driveRes = await drive.files.create({
       resource: fileMetadata,
       media: media,
       fields: "id",
@@ -59,32 +59,17 @@ app.post("/upload" , async (req,res) => {
     
 });
 
-app.post("/predict" , (req,res) => {
-    console.log("Running prediction body");
-
-    exec("python script.py", (error, stdout2, stderr2) => {
-    if (error) {
-      console.error("Python script failed:", error);
-      console.error("stderr:", stderr2);
-      return res.status(500).json({ success: false, message: "Prediction failed" });
-    }
-
-    if (stderr2) {
-      console.log("Inside stderr2:", stderr2);
-      return res.status(500).json({ success: false, message: "Prediction failed" });
-    }
-
-    console.log("STDOUT:", stdout2);
-
-    try {
-      const base64 = fs.readFileSync("result_base64.txt", "utf8");
-      fs.unlinkSync("result_base64.txt");
-      res.json({ success: true, predictedImage: base64 });
-    } catch (e) {
-      console.error("Could not read result_base64.txt:", e);
-      res.status(500).json({ success: false, message: "No result generated" });
-    }
-  });
+app.post("/predict", (req,res) => {
+    exec("python drive_yolo_predict.py", (error,stdout,stderr) => {
+      if(error){
+        console.log(error);
+      }
+      else if(stderr){
+        console.log(stderr);
+      }
+      console.log(stdout);
+      res.json({success:false});
+    });
 });
 
 
