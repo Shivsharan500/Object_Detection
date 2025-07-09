@@ -3,7 +3,7 @@ const app = express();
 if (process.env.NODE_ENV !== "production") {
   require("dotenv").config();
 }
-const port = process.env.port;
+const port = process.env.port || 3000;
 const path = require("path");
 const fs = require("fs");
 const { google } = require("googleapis");
@@ -87,6 +87,6 @@ app.get("/", (req,res) => {
     res.render("home.ejs");
 });
 
-app.listen(port, () => {
+app.listen(port, '0.0.0.0',() => {
     console.log(`Server is Listening to port:${port}`);
 });
