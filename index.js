@@ -63,12 +63,17 @@ app.post("/predict", (req,res) => {
     exec("python drive_yolo_predict.py", (error,stdout,stderr) => {
       if(error){
         console.log(error);
+        res.json({success:false});
       }
       else if(stderr){
         console.log(stderr);
+        res.json({success:false});
       }
-      console.log(stdout);
-      res.json({success:false});
+      else{
+        console.log(stdout);
+        res.json({success:true});
+      }
+      
     });
 });
 
