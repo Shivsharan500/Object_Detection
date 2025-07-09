@@ -59,16 +59,18 @@ app.post("/upload" , async (req,res) => {
     
 });
 
-app.post("/predict" , (req,res) => {
+app.post("/predict" , async (req,res) => {
     console.log("Running prediction body");
-    exec("ls",(error,stdout2,stderr2) => {
-      console.log("exec is working",stdout2);
-    });
-    console.log("In the middle of both exce");
-    exec("python drive_yolo_predict.py", (error, stdout2, stderr2) => {
+
+    await exec("python drive_yolo_predict.py", (error, stdout2, stderr2) => {
       if (error) {
         console.error("Python script failed:", error);
         console.error("stderr:", stderr2);
+        return res.status(500).json({ success: false, message: "Prediction failed" });
+      }
+
+      if(stderr2){
+        console.log("Inside stderr2:",stderr2);
         return res.status(500).json({ success: false, message: "Prediction failed" });
       }
 
